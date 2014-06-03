@@ -32,7 +32,8 @@ Prerequisites
 - Build the docker and opscenter images (optional)
 
 		./cassandra/build.sh
-		./opscenter/build.sh
+		./opscenter/centos/build.sh (centos based image)
+		./opscenter/ubuntu/build.sh (ubuntu based image)
 
 The last step is optional because Docker will automatically pull the images from [index.docker.io](https://index.docker.io) if you don't already have them. The build process needs an Internet connection, but it is executed only once and then cached on Docker. If you modify the scripts, this is how you can re-build the images with your changes.
 
@@ -165,7 +166,8 @@ Cassandra cluster + OpsCenter monitoring
 		
 2. Start the OpsCenter container:
 
-		docker run -d -name opscenter poklet/opscenter
+		docker run -d -name opscenter cassandrad/opscenter
+		
 
 	You can also add the `-p 8888:8888` option to bind container's 8888 port to host's 8888 port
 
