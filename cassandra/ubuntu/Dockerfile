@@ -2,20 +2,30 @@
 #
 # VERSION               1.0
 
-FROM centos
+FROM ubuntu:trust
+MAINTAINER Nisan Haramati hanisan@gmail.com
 
-# Install HotSpot JDK 7u51
-RUN wget -q -O - --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8-b132/jdk-8-linux-x64.rpm" > /tmp/jdk.rpm
-RUN rpm -ivh /tmp/jdk.rpm && rm /tmp/jdk.rpm
-RUN alternatives --install /usr/bin/java java /usr/java/default/bin/java 20000
+ADD src/jre-7u51-linux-x64.gz /tmp/jre-7u51-linux-x64.gz
+RUN mkdir /usr/lib/jvm
+RUN tar -zxvf /tmp/jre-7u51-linux-x64.gz -C /usr/lib/jvm
+RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jre1.7.0_51/bin/java" 1
+RUN update-alternatives --set java /usr/lib/jvm/jre1.7.0_51/bin/java
 
-# Install packges (sshd + supervisord + monitoring tools + cassandra)
-ADD src/epel6.repo /etc/yum.repos.d/epel6.repo
-ADD src/datastax.repo /etc/yum.repos.d/datastax.repo
-RUN yum install -y openssh-server openssh-clients 
-RUN yum install -y supervisor 
-RUN yum install -y dsc20
-RUN yum install -y sysstat sudo which 
+# get Java Native Access (JNA)
+apt-get -y -f install libjna-java
+
+# Install datastax OpsCenter
+ADD src/datastax.community.list /etc/apt/sources.list.d/datastax.community.list
+ADD src/debian.datastax.com.pgp /var/datastax/debian.datastax.com.pgp
+RUN apt-key add /var/datastax/debian.datastax.com.pgp
+RUN apt-get update
+
+# install supervisord
+RUN apt-get -y -f install supervisor
+
+# install monitoring tools
+RUN apt-get -y -f install dsc20
+RUN apt-get -y -f install sysstat
 
 # Configure SSH server
 RUN mkdir -p /var/run/sshd && chmod -rx /var/run/sshd
