@@ -14,7 +14,7 @@ RUN update-alternatives --set java /usr/lib/jvm/jre1.7.0_51/bin/java
 # get Java Native Access (JNA)
 RUN apt-get -y -f install libjna-java
 
-# Install datastax OpsCenter
+# Install datastax repo
 RUN cp /tmp/src/datastax.community.list /etc/apt/sources.list.d/datastax.community.list
 RUN apt-key add /tmp/src/debian.datastax.com.pgp
 RUN apt-get update
@@ -39,12 +39,12 @@ RUN mkdir -p /var/run/sshd && chmod -rx /var/run/sshd
 # remove old hosts file if its there
 RUN rm -fr /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -t rsa -N '' -f /etc/ssh/ssh_host_rsa_key
-RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
+RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin without-password/g' /etc/ssh/sshd_config
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 
 # Create OpsCenter account
-RUN useradd -m -G users,root -p $(openssl passwd -1 "opscenter") opscenter
+RUN useradd -m -G users,root -s /bin/bash opscenter
 RUN echo "%root ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Configure supervisord
@@ -61,7 +61,25 @@ RUN rm -f /etc/security/limits.d/cassandra.conf
 # See https://groups.google.com/d/msg/docker-user/zC_wX1Uyl_U/Q5Ex5kg1VQ0J
 RUN ln -s /proc/mounts /etc/mtab
 
-EXPOSE 7199 7000 7001 9160 9042
-EXPOSE 22 8012 61621
+## Cassandra ports
+# JMX: 7199 cassandra-env.sh
+EXPOSE 7199
+# storage_port: 7000 cassandra.yaml
+EXPOSE 7000
+# ssl_storage_port: 7001 cassandra.yaml
+EXPOSE 7001
+# rpc_port: 9160 cassandra.yaml
+EXPOSE 9160
+# native_transport_port: 9042 cassandra.yaml
+EXPOSE 9042
+## datastax-agent (opscenter agent)
+# ssh port: 22 opscenerd.conf
+EXPOSE 22
+# hadoop job tracker thrift port: 8012
+EXPOSE 8012
+# datastax agent port: 61621
+EXPOSE 61621
+
+## start sequence
 USER root 
 CMD start

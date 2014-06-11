@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IP=`hostname --ip-address`
-if [ $# == 1 ]; then SEEDS="$1,$IP"; 
+if [ $# == 1 ]; then SEEDS="$1,$IP";
 else SEEDS="$IP"; fi
 
 echo Configuring Cassandra to listen at $IP with seeds $SEEDS
@@ -18,4 +18,5 @@ sed -i -e "s/# JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname=<public name>\"/ 
 
 # Start process
 echo Starting Cassandra on $IP...
-/usr/bin/supervisord 
+/usr/bin/supervisord
+
