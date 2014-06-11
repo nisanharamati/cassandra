@@ -31,7 +31,8 @@ Prerequisites
 
 - Build the docker and opscenter images (optional)
 
-		./cassandra/build.sh
+		./cassandra/centos/build.sh (centos based image)
+		./cassandra/ubuntu/build.sh (ubuntu based image)
 		./opscenter/centos/build.sh (centos based image)
 		./opscenter/ubuntu/build.sh (ubuntu based image)
 
