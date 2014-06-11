@@ -2,33 +2,42 @@
 #
 # VERSION               1.0
 
-FROM ubuntu:trust
+FROM ubuntu:trusty
 MAINTAINER Nisan Haramati hanisan@gmail.com
 
-ADD src/jre-7u51-linux-x64.gz /tmp/jre-7u51-linux-x64.gz
-RUN mkdir /usr/lib/jvm
-RUN tar -zxvf /tmp/jre-7u51-linux-x64.gz -C /usr/lib/jvm
+ADD src /tmp/src
+RUN mkdir -p /usr/lib/jvm
+RUN tar -zxvf /tmp/src/jre-7u51-linux-x64.gz -C /usr/lib/jvm
 RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jre1.7.0_51/bin/java" 1
 RUN update-alternatives --set java /usr/lib/jvm/jre1.7.0_51/bin/java
 
 # get Java Native Access (JNA)
-apt-get -y -f install libjna-java
+RUN apt-get -y -f install libjna-java
 
 # Install datastax OpsCenter
-ADD src/datastax.community.list /etc/apt/sources.list.d/datastax.community.list
-ADD src/debian.datastax.com.pgp /var/datastax/debian.datastax.com.pgp
-RUN apt-key add /var/datastax/debian.datastax.com.pgp
+RUN cp /tmp/src/datastax.community.list /etc/apt/sources.list.d/datastax.community.list
+RUN apt-key add /tmp/src/debian.datastax.com.pgp
 RUN apt-get update
 
-# install supervisord
-RUN apt-get -y -f install supervisor
-
-# install monitoring tools
+# install cassandra in stopped state
 RUN apt-get -y -f install dsc20
+RUN service cassandra stop
+
+# install agent in stopped state
+RUN apt-get -y -f install datastax-agent
+RUN service datastax-agent stop
+
+# install supervisord & sysstat & openssh-server
+RUN apt-get -y -f install supervisor
+RUN mkdir -p /var/log/supervisor
 RUN apt-get -y -f install sysstat
+RUN apt-get -y -f install openssh-server
+RUN mkdir -p /var/run/sshd
 
 # Configure SSH server
 RUN mkdir -p /var/run/sshd && chmod -rx /var/run/sshd
+# remove old hosts file if its there
+RUN rm -fr /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -t rsa -N '' -f /etc/ssh/ssh_host_rsa_key
 RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
