@@ -20,11 +20,11 @@ RUN apt-key add /tmp/src/debian.datastax.com.pgp
 RUN apt-get update
 
 # install cassandra in stopped state
-RUN apt-get -y -f install dsc20
+RUN apt-get -y -f install cassandra=2.0.9
 RUN service cassandra stop
 
 # install agent in stopped state
-RUN apt-get -y -f install datastax-agent
+RUN apt-get -y -f install datastax-agent=4.1.4
 RUN service datastax-agent stop
 
 # install supervisord & sysstat & openssh-server
