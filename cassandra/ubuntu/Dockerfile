@@ -59,7 +59,7 @@ ADD src/start.sh /usr/local/bin/start
 RUN rm -f /etc/security/limits.d/cassandra.conf
 # Necassary to make df tool run correctly
 # See https://groups.google.com/d/msg/docker-user/zC_wX1Uyl_U/Q5Ex5kg1VQ0J
-RUN ln -s /proc/mounts /etc/mtab
+#RUN ln -s /proc/mounts /etc/mtab
 
 ## Cassandra ports
 # JMX: 7199 cassandra-env.sh
