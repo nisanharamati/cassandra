@@ -5,6 +5,9 @@
 FROM ubuntu:trusty
 MAINTAINER Nisan Haramati hanisan@gmail.com
 
+# Install nano and locate because I don't want to have to manually install it.
+RUN apt-get -y -f install nano locate
+
 ADD src /tmp/src
 RUN mkdir -p /usr/lib/jvm
 RUN tar -zxvf /tmp/src/jre-7u51-linux-x64.gz -C /usr/lib/jvm
