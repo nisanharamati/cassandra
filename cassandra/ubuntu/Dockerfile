@@ -27,7 +27,7 @@ RUN apt-get -y -f install cassandra=2.0.9
 RUN service cassandra stop
 
 # install agent in stopped state
-RUN apt-get -y -f install datastax-agent=4.1.4
+RUN apt-get -y -f install datastax-agent=5.0.0
 RUN service datastax-agent stop
 
 # install supervisord & sysstat & openssh-server
